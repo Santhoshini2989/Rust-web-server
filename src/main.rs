@@ -9,11 +9,14 @@ fn main() {
 
     println!("Server listening on http://127.0.0.1:7878");
 
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
+     for stream in listener.incoming() {
+    let stream = stream.unwrap();
 
+    thread::spawn(|| {
         handle_connection(stream);
-    }
+    });
+}
+
 }
 
 fn handle_connection(mut stream: TcpStream) {
