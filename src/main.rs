@@ -1,6 +1,8 @@
- use std::fs;
+use std::fs;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
+use std::thread;
+use std::time::Duration;
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
@@ -14,7 +16,7 @@ fn main() {
     }
 }
 
- fn handle_connection(mut stream: TcpStream) {
+fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
 
     stream.read(&mut buffer).unwrap();
@@ -22,6 +24,10 @@ fn main() {
     let request = String::from_utf8_lossy(&buffer);
 
     let (status_line, filename) = if request.starts_with("GET / HTTP/1.1") {
+        ("HTTP/1.1 200 OK", "hello.html")
+    } else if request.starts_with("GET /sleep HTTP/1.1") {
+        thread::sleep(Duration::from_secs(5));
+
         ("HTTP/1.1 200 OK", "hello.html")
     } else {
         ("HTTP/1.1 404 NOT FOUND", "404.html")
